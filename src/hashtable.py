@@ -16,7 +16,6 @@ class HashTable:
         self.capacity = capacity  # Number of buckets in the hash table
         self.storage = [None] * capacity
 
-        self.count = 0
 
 
     def _hash(self, key):
@@ -28,6 +27,7 @@ class HashTable:
         return hash(key)
 
 
+
     def _hash_djb2(self, key):
         '''
         Hash an arbitrary key using DJB2 hash
@@ -35,6 +35,7 @@ class HashTable:
         OPTIONAL STRETCH: Research and implement DJB2
         '''
         pass
+
 
 
     def _hash_mod(self, key):
@@ -45,6 +46,7 @@ class HashTable:
         return self._hash(key) % self.capacity
 
 
+
     def insert(self, key, value):
         '''
         Store the value with the given key.
@@ -53,7 +55,13 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
+        index = self._hash_mod(key)
+
+        if self.storage[index] is not None:
+            print("Warning: Index Collision")
+            return        
+
+        self.storage[index] = LinkedPair(key, value)
 
 
 
@@ -65,7 +73,14 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
+        index = self._hash_mod(key)
+
+        if self.storage[index] is None:
+            print("Warning, key not found!")
+            return
+        
+        self.storage[index] = None
+
 
 
     def retrieve(self, key):
@@ -76,7 +91,14 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
+        index = self._hash_mod(key)
+        pair = self.storage[index]
+
+        if pair is None:
+            return None
+        else:
+            return pair.value
+
 
 
     def resize(self):
@@ -88,15 +110,21 @@ class HashTable:
         '''
         self.capacity *= 2
         new_storage = [None] * self.capacity
-        for i in range(self.count):
-            new_storage[i] = self.storage[i]
+
+        for pair in self.storage:
+            if pair is not None:
+                new_index = self._hash_mod(pair.key)
+                new_storage[new_index] = pair
 
         self.storage = new_storage
+
+        
 
 
 
 if __name__ == "__main__":
-    ht = HashTable(2)
+    ht = HashTable(4)
+    print("ht.storage=", ht.storage)
 
     ht.insert("line_1", "Tiny hash table")
     ht.insert("line_2", "Filled beyond capacity")
@@ -109,12 +137,17 @@ if __name__ == "__main__":
     print(ht.retrieve("line_2"))
     print(ht.retrieve("line_3"))
 
+    # ht.remove("line_3")
+    # ht.remove("line 3") # what is this testing?
+
     # Test resizing
     old_capacity = len(ht.storage)
     ht.resize()
     new_capacity = len(ht.storage)
-
+    
+    print("ht.storage=", ht.storage)
     print(f"\nResized from {old_capacity} to {new_capacity}.\n")
+    print("ht.storage=", ht.storage)
 
     # Test if data intact after resizing
     print(ht.retrieve("line_1"))
