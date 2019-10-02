@@ -58,7 +58,11 @@ class HashTable:
         index = self._hash_mod(key)
 
         if self.storage[index] is not None:
-            print("Warning: Index Collision")
+            current = self.storage[index]
+
+            while current.next is not None and current.key != key:
+                current = current.next
+            current.next = LinkedPair(key, value)
             return        
 
         self.storage[index] = LinkedPair(key, value)
@@ -92,12 +96,19 @@ class HashTable:
         Fill this in.
         '''
         index = self._hash_mod(key)
-        pair = self.storage[index]
-
-        if pair is None:
+        
+        if self.storage[index] is None:
             return None
         else:
-            return pair.value
+            current = self.storage[index]
+            if current.key == key:
+                return current.value
+            while current is not None:
+                if current.key == key:
+                    return current.value
+                else:
+                    current = current.next
+            return None
 
 
 
@@ -123,8 +134,7 @@ class HashTable:
 
 
 if __name__ == "__main__":
-    ht = HashTable(4)
-    print("ht.storage=", ht.storage)
+    ht = HashTable(2)
 
     ht.insert("line_1", "Tiny hash table")
     ht.insert("line_2", "Filled beyond capacity")
@@ -137,17 +147,12 @@ if __name__ == "__main__":
     print(ht.retrieve("line_2"))
     print(ht.retrieve("line_3"))
 
-    # ht.remove("line_3")
-    # ht.remove("line 3") # what is this testing?
-
     # Test resizing
     old_capacity = len(ht.storage)
     ht.resize()
-    new_capacity = len(ht.storage)
-    
-    print("ht.storage=", ht.storage)
+    new_capacity = len(ht.storage)    
+
     print(f"\nResized from {old_capacity} to {new_capacity}.\n")
-    print("ht.storage=", ht.storage)
 
     # Test if data intact after resizing
     print(ht.retrieve("line_1"))
