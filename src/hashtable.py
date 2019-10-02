@@ -119,15 +119,26 @@ class HashTable:
 
         Fill this in.
         '''
+        # self.capacity *= 2
+        # new_storage = [None] * self.capacity
+
+        # for pair in self.storage:
+        #     if pair is not None:
+        #         new_index = self._hash_mod(pair.key)
+        #         new_storage[new_index] = pair
+
+        # self.storage = new_storage
+
+        old_storage = self.storage
         self.capacity *= 2
-        new_storage = [None] * self.capacity
+        self.storage = [None] * self.capacity
+        pair = None
 
-        for pair in self.storage:
-            if pair is not None:
-                new_index = self._hash_mod(pair.key)
-                new_storage[new_index] = pair
-
-        self.storage = new_storage
+        for i in old_storage:
+            pair = i
+            while pair is not None:
+                self.insert(pair.key, pair.value)
+                pair = pair.next
 
         
 
